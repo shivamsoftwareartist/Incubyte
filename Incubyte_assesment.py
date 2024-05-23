@@ -11,7 +11,13 @@ def add(numbers):
         numbers = parts[1]
     
     numbers = numbers.replace('\n', delimiter)
-    return sum(map(int, re.split(delimiter, numbers)))
+    number_list = list(map(int, re.split(delimiter, numbers)))
+    
+    negative_numbers = [num for num in number_list if num < 0]
+    if negative_numbers:
+        raise ValueError(f"negative numbers not allowed: {', '.join(map(str, negative_numbers))}")
+    
+    return sum(number_list)
 
 class TestStringCalculator(unittest.TestCase):
     '''
@@ -39,6 +45,21 @@ class TestStringCalculator(unittest.TestCase):
 
         #Add another test case pipe | (not mention in problem statement)
         self.assertEqual(add("//|\n1|2|3"), 6)
-    
+
+    #Case 6: Test negative numbers not allowed
+    def test_add_negative_numbers(self):
+
+        #For one negative number
+        with self.assertRaises(ValueError) as context:
+            add("1,-2,3")
+
+        # Checking if the exception message is same as given
+        self.assertEqual(str(context.exception), "negative numbers not allowed: -2")
+
+        #for multiple negative number
+        with self.assertRaises(ValueError) as context:
+            add("-1,2,-3")
+        self.assertEqual(str(context.exception), "negative numbers not allowed: -1, -3")
+
 if __name__ == '__main__':
     unittest.main()
